@@ -1,7 +1,6 @@
 # Whole Project README.md File
 ---
 
-## ✅ Suggested `README.md` (Root)
 
 ```markdown
 # STM32 Water Dispense Controller
