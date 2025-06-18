@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../../CS50 Python"
+		},
+		{
+			"name": "stm32hardware",
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "stm32hardware"
+	}
+}

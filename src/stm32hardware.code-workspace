@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "hardware",
+			"path": "../../../../PlatformIO/Projects/hardware"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "stm32hardware"
+	}
+}
