@@ -1,4 +1,3 @@
-````markdown
 # 🧪 STM32 Pump Control System (Pump 4 + Sensor 4 Debug Version)
 
 This project is a standalone STM32 (Arduino-style) sketch that controls  Pump 4 using Flow  Sensor 4 with dynamic, volume-based calibration and serial command interface for precise liquid dispensing.

@@ -1,8 +1,7 @@
+# 🧪 STM32 Pump Control System (Pump 5 + Sensor 5 Debug Version)
 
-# 🧪 STM32 Pump Control System (Pump 3 + Sensor 3 Debug Version)
-```
-This project is a standalone STM32 (Arduino-style) sketch that controls Pump 3 using Flow Sensor 3 with dynamic, volume-based calibration and serial command interface for precise liquid dispensing.
-```
+This project is a standalone STM32 (Arduino-style) sketch that controls  Pump 5 using Flow  Sensor 5 with dynamic, volume-based calibration and serial command interface for precise liquid dispensing.
+
 ---
 
 ## 🚀 Features
@@ -17,9 +16,9 @@ This project is a standalone STM32 (Arduino-style) sketch that controls Pump 3 u
 ---
 
 ## 🧠 Calibration Logic
-```
-The program dynamically selects a calibration factor based on the target volume:
 
+The program dynamically selects a calibration factor based on the target volume:
+s
 | Volume Range (mL) | Calibration Index | Default Factor |
 |------------------:|------------------:|----------------|
 | 0–50              | 0                 | 18.00          |
@@ -28,42 +27,64 @@ The program dynamically selects a calibration factor based on the target volume:
 | 151–1000          | 3                 | 50.00          |
 
 You can override these values live via serial commands.
-```
+
 ---
 
 ## 🖥️ Serial Commands
-```
+
+```Serial Command
+🔧 Calibration updated: Range1 → 12.50
+⚙️ Pump 5 ON - Target: 100 mL | Cal: 12.50
+📏 Pulses: 11 | Flow: 0.9 mL/s | Total: 0.9/100 mL
+📏 Pulses: 203 | Flow: 16.2 mL/s | Total: 16.2/100 mL
+📏 Pulses: 382 | Flow: 30.6 mL/s | Total: 30.6/100 mL
+📏 Pulses: 573 | Flow: 45.8 mL/s | Total: 45.8/100 mL
+📏 Pulses: 791 | Flow: 63.3 mL/s | Total: 63.3/100 mL
+📏 Pulses: 1007 | Flow: 80.6 mL/s | Total: 80.6/100 mL
+📏 Pulses: 1205 | Flow: 96.4 mL/s | Total: 96.4/100 mL
+🚑 Pump 5 OFF
+🌟 Target reached!
+📊 Current Calibration:
+0-50mL: 7.60
+51-100mL: 12.50
+101-150mL: 10.00
+151-1000mL: 10.00
 🛑 ALL PUMPS OFF
-⚙️ Pump 2 ON - Target: 100 mL | Cal: 5.20
-📏 Pulses: 0 | Flow: 0.0 mL/s | Total: 0.0/100 mL
-📏 Pulses: 88 | Flow: 16.9 mL/s | Total: 16.9/100 mL
-📏 Pulses: 170 | Flow: 32.7 mL/s | Total: 32.7/100 mL
-📏 Pulses: 240 | Flow: 46.2 mL/s | Total: 46.2/100 mL
-📏 Pulses: 316 | Flow: 60.8 mL/s | Total: 60.8/100 mL
-📏 Pulses: 412 | Flow: 79.2 mL/s | Total: 79.2/100 mL
-🚑 Pump 2 OFF
+⚙️ Pump 5 ON - Target: 25 mL | Cal: 7.60
+📏 Pulses: 0 | Flow: 0.0 mL/s | Total: 0.0/25 mL
+🚑 Pump 5 OFF
 🌟 Target reached!
 🛑 ALL PUMPS OFF
-⚙️ Pump 2 ON - Target: 100 mL | Cal: 5.20
-📏 Pulses: 2 | Flow: 0.0 mL/s | Total: 0.0/100 mL
-📏 Pulses: 88 | Flow: 16.9 mL/s | Total: 16.9/100 mL
-📏 Pulses: 192 | Flow: 36.9 mL/s | Total: 36.9/100 mL
-📏 Pulses: 257 | Flow: 49.4 mL/s | Total: 49.4/100 mL
-📏 Pulses: 333 | Flow: 64.0 mL/s | Total: 64.0/100 mL
-📏 Pulses: 443 | Flow: 85.2 mL/s | Total: 85.2/100 mL
-🚑 Pump 2 OFF
+⚙️ Pump 5 ON - Target: 50 mL | Cal: 7.60
+📏 Pulses: 0 | Flow: 0.0 mL/s | Total: 0.0/50 mL
+📏 Pulses: 173 | Flow: 22.8 mL/s | Total: 22.8/50 mL
+📏 Pulses: 372 | Flow: 48.9 mL/s | Total: 48.9/50 mL
+🚑 Pump 5 OFF
+🌟 Target reached!
+🛑 ALL PUMPS OFF
+⚙️ Pump 5 ON - Target: 50 mL | Cal: 7.60
+📏 Pulses: 0 | Flow: 0.0 mL/s | Total: 0.0/50 mL
+📏 Pulses: 185 | Flow: 24.3 mL/s | Total: 24.3/50 mL
+📏 Pulses: 332 | Flow: 43.7 mL/s | Total: 43.7/50 mL
+🚑 Pump 5 OFF
+🌟 Target reached!
+📊 Current Calibration:
+0-50mL: 7.60
+51-100mL: 12.50
+101-150mL: 10.00
+151-1000mL: 10.00
 ```
 
 ### 🧪 Dispense Command
 
-```
-D3:<volume>
-D3:<volume>:<cal>@<range>
+```text
+D5:<volume>
+D5:<volume>:<cal>@<range>
 ````
 
-*  D3:100  – Dispenses 100 mL using the default calibration for 51–100 mL range.
-*  D3:100:11.5\@1  – Sets range 1 calibration to 11.5, then dispenses 100 mL.
-*  D3:150:30\@2  – Sets range 2 calibration to 30.0, then dispenses 150 mL.
+*  D5:100  – Dispenses 100 mL using the default calibration for 51–100 mL range.
+*  D5:100:11.5\@1  – Sets range 1 calibration to 11.5, then dispenses 100 mL.
+*  D5:150: 40\@2  – Sets range 2 calibration to  40.0, then dispenses 150 mL.
 
 ### ⚙️ Calibration Only
 
@@ -92,16 +113,16 @@ S
 ---
 
 ## 🧰 Hardware Setup
-```
+
 | Component     | Pin   |
 | ------------- | ----- |
-| Pump 1        | `PB7` |
-| Flow Sensor 1 | `PA2` |
+| Pump 5       | `PB5` |
+| Flow Sensor 5 | `PA4` |
 
 * `pumpPin` uses digital HIGH/LOW to control pump power.
 * `sensorPin` is connected to the flow sensor's pulse output.
 * Ensure pull-up or pull-down is correct for your sensor model.
-```
+
 ---
 
 ## 🔄 Pump Operation
@@ -146,7 +167,7 @@ S
 
 ## 📁 File Info
 
-*  Filename:  `pump2_debug.ino` (can be renamed as needed)
+*  Filename:  `pump5_debug.ino` (can be renamed as needed)
 *  Platform:  STM32 (Arduino Core or STM32duino)
 *  Dependencies:  None
 
