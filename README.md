@@ -24,6 +24,10 @@ stm32-water-dispense-controller/
 │   ├── main.cpp
 │   ├── main1.cpp
 │   ├── main2.cpp
+│   ├── img
+│   |    ├── Bottle.jpg
+│   |    ├── Circuit.jpg
+│   |    ├── Overall.jpg
 │   ├── flowsensortester/
 │   ├── Testing1pump1sensor/
 │   │   ├── testing1pumpsensor.cpp
@@ -187,7 +191,36 @@ C              // Show calibration values
 S              // Stop all pumps
 ````
 
+## 📌 Prototype Demo Videos 
+```
+### 💧 Water Dispensing System | STM32 Blue Pill + Python GUI  
+```
 ---
+  
+#### 📌 💧 Water Dispensing System | STM32 Blue Pill + Python GUI (Prototype Demo) Part 1
+[![Part 1 Demo](https://img.youtube.com/vi/rZtVd0Mnc2o/0.jpg)](https://youtu.be/rZtVd0Mnc2o)  
+
+#### 📌 💧 Water Dispensing System | STM32 Blue Pill + Python GUI (Prototype Demo) Part 2 
+[![Part 2 Demo](https://img.youtube.com/vi/Hda0gbTluGE/0.jpg)](https://youtu.be/Hda0gbTluGE)  
+
+#### 📌 💧 Water Dispensing System | STM32 Blue Pill + Python GUI (Prototype Demo) Part 3 
+[![Part 3 Demo](https://img.youtube.com/vi/YB9_dY_8Kjg/0.jpg)](https://youtu.be/YB9_dY_8Kjg)  
+
+#### 📌 💧 Water Dispensing System | STM32 Blue Pill + Python GUI (Prototype Demo) Part 4
+[![Part 4 Demo](https://img.youtube.com/vi/yIh98R7sNp0/0.jpg)](https://youtu.be/yIh98R7sNp0)  
+
+---
+
+## 📸 Project Images
+
+### 1. Circuit Diagram
+![Circuit](img/Circuit.jpg)  
+
+### 2. Bottle Design
+![Bottle](img/Bottle.jpg)  
+
+### 3. Overall Setup
+![Overall System](img/Overall.jpg)
 
 ## 🧑‍💻 Developed By
 
