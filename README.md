@@ -1,22 +1,21 @@
-# Whole Project README.md File
----
+# STM32 Multi-Pump Water Dispensing System 🚰
 
+This project controls up to 9 water pumps with independent flow sensors using an STM32 microcontroller. Each pump dispenses a user-defined volume of water in milliliters (mL), and the system adjusts output using calibration factors or time-based estimates.
 
-```markdown
-# STM32 Water Dispense Controller
+## 🚀 Features
 
-This is the hardware-side code for a water dispensing system built on  STM32 . The system uses pulse-counting flow sensors and MOSFET-controlled pumps, with dynamic calibration based on the target volume.
+- 🔢 Supports **9 pumps** and **9 flow sensors**
+- 🧠 **Volume-based control** using calibration (Pumps 1–7 & 9)
+- ⏱️ **Time-based fake dispensing** (Pump 8 only – no sensor!)
+- 🧪 Real-time serial feedback for debugging and monitoring
+- 🔧 Dynamic calibration adjustment via serial input
+- 🛑 Emergency stop for all pumps
+- 🗨️ Clear serial command interface
 
-> 💧 Designed for precise multi-channel water dispensing using STM32 microcontrollers.
-
----
 
 ## 📁 Directory Structure
 
 ```
-
-```
-
 stm32-water-dispense-controller/
 ├── .vscode/                    # VSCode settings (PlatformIO or Arduino config)
 ├── include/                   # Header files (if any)
@@ -59,65 +58,146 @@ stm32-water-dispense-controller/
 ├── CS50 Python.code-workspace # Workspace config (This is from another project!)
 ├── stm32hardware.code-workspace
 └── platformio.ini             # PlatformIO project config
+```
 
+## 🛠️ Hardware Pin Mapping
+
+| Pump | Pump Pin | Sensor Pin | Notes               |
+|------|----------|------------|---------------------|
+| 1    | PB9      | PA0        | Calibrated flow     |
+| 2    | PB8      | PA1        | Calibrated flow     |
+| 3    | PB7      | PA2        | Calibrated flow     |
+| 4    | PB6      | PA3        | Calibrated flow     |
+| 5    | PB5      | PA4        | Calibrated flow     |
+| 6    | PB4      | PA5        | Calibrated flow     |
+| 7    | PB3      | PA6        | Calibrated flow     |
+| 8    | PA15     | N/A        | **Time-based only** |
+| 9    | PA12     | PA8        | Calibrated flow     |
+
+---
+
+## 📘 Serial Commands
+
+### ✅ Dispense
 
 ```
 
----
-
-## 🧪 Test Directories
-
-Each test folder in `src/` is  self-contained  and includes its own `README.md`:
-
-- `Testing1pump1sensor/` – Test for one pump and one sensor.
-- `Testing2pump2sensor/` – Test for two pumps/sensors.
-- `Testing3pump3sensor/` – Test for three pumps/sensors.
-- Additional tests explore calibration, fault handling, and scaling.
-
----
-
-## ⚙️ Features
-
-- STM32-compatible C++ code (Arduino-based or PlatformIO)
-- Dynamic calibration based on volume ranges
-- Flow sensor pulse counting
-- MOSFET pump control
-- Serial command interface (e.g., `D2:100`, `D4:<range>:<cal>`, `S`)
-- Safety timeout (auto-shutdown if no flow detected)
-
----
-
-## 📌 Notes
-
-- Software (Python GUI) is in a  separate repo : [link placeholder]
-- Designed for modular testing and hardware debugging
-- Actively developed and tested on STM32 with PlatformIO
-
----
-
+D<id>:<volume>
 
 ```
 
+- Example: `D3:100` → Pump 3 will dispense 100 mL using pulse counting.
+- Pump 8 uses time-based durations.
+
 ---
 
-## 📄 License
+### ⚙️ Update Calibration
 
-MIT License
+```
 
-Copyright (c) 2025 Robin Glory
+D<id>:<volume>:<cal>@<range>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+```
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+- Example: `D5:100:12.4@1` → Sets calibration of Pump 5 Range 1 to 12.4, then dispenses 100 mL.
+- **Pump 8 ignores calibration changes.**
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY...
+---
+
+### 🛠️ Set Calibration Only
+
+```
+
+R:<range>:<cal>
+
+```
+
+- Example: `R:2:31.5` → Set calibration factor for range 2 of the active pump.
+- Only works with Pumps 1–7 & 9.
+
+---
+
+### 📊 Show Calibration
+
+```
+
+C
+
+```
+
+- Shows all calibration values.
+
+```
+
+C8
+
+```
+
+- Shows fake calibration values for Pump 8 only.
+
+---
+
+### 🛑 Stop Pumps
+
+```
+
+S
+
+````
+
+- Stops all pumps immediately.
+
+---
+
+## 📦 Calibration Defaults
+
+Each pump uses 4 calibration ranges:
+
+| Range        | Volume (mL)     |
+|--------------|-----------------|
+| Range 0      | 0–50 mL         |
+| Range 1      | 51–100 mL       |
+| Range 2      | 101–150 mL      |
+| Range 3      | 151–1000 mL     |
+
+Each pump has its own default values hardcoded in the source file.
+
+---
+
+## ❗ Pump 8 Special Case
+
+Pump 8's flow sensor was faulty. So instead, the pump operates **based on estimated duration**:
+
+| Volume | Duration (s) |
+|--------|--------------|
+| 50 mL  | 6.236 s      |
+| 100 mL | 12.208 s     |
+| 150 mL | 18.400 s     |
+
+No real calibration is used — just fake reporting for consistency.
+
+---
+
+## 🧠 Example Usage
+
+```text
+D1:100         // Pump 1 dispenses 100 mL
+D8:50          // Pump 8 runs for 6.236s (fake 50 mL)
+C              // Show calibration values
+S              // Stop all pumps
+````
+
+---
+
+## 🧑‍💻 Developed By
+
+Robin Glory
+Mechatronics & Computer Science Student
+GitHub: [robinglory](https://github.com/robinglory)
+
+---
+
+```
+
+Let me know if you want me to [add it directly into your repo](f) or format it into a downloadable file.
+```

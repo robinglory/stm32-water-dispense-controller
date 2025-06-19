@@ -366,23 +366,195 @@
 //   }
 // }
 
+// // This code is for a multi-pump system with calibration and flow measurement without pump 8
+// // It uses interrupts to count pulses from flow sensors and controls pumps based on user commands.
+// // The code is designed for an Arduino environment and includes features for calibration, flow rate measurement, and user commands to control the pumps.
+// // The code is structured to handle up to 9 pumps, with specific calibration factors for each pump and the ability to stop all pumps or display calibration information.
+// #include <Arduino.h>
+
+// const int allPumpPins[9] = {PB9, PB8, PB7, PB6, PB5, PB4, PB3, PA15, PA12};
+// const int allSensorPins[9] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, -1, PA8}; // -1 for Pump 8 (no sensor)
+
+// float allCalibrationFactors[9][4] = {
+//   {18.00, 23.00, 30.00, 50.00},  // Pump 1
+//   {1.90,  1.90,  1.90,  1.90},   // Pump 2
+//   {2.40,  5.20,  5.50,  5.50},   // Pump 3
+//   {3.00,  8.70,  10.00, 10.00},  // Pump 4
+//   {8.00,  13.00, 15.00, 15.00},  // Pump 5
+//   {4.10,  4.70,  5.18,  5.56},   // Pump 6
+//   {4.10,  3.12,  2.34,  1.71},   // Pump 7
+//   {0,     0,     0,     0},      // Pump 8 (not included)
+//   {31.30, 31.30, 29.80, 28.50}   // Pump 9
+// };
+
+// volatile uint32_t pulseCount = 0;
+// unsigned long targetVolume = 0;
+// unsigned long dispensedVolume = 0;
+// unsigned long lastPulseTime = 0;
+// bool pumpOn = false;
+// int currentPump = -1;
+
+// void stopAllPumps() {
+//   for (int i = 0; i < 9; i++) {
+//     digitalWrite(allPumpPins[i], LOW);
+//   }
+//   if (pumpOn && currentPump != 7) {
+//     detachInterrupt(digitalPinToInterrupt(allSensorPins[currentPump]));
+//   }
+//   pumpOn = false;
+//   currentPump = -1;
+//   Serial.println("\xF0\x9F\x9B\x91 ALL PUMPS OFF");
+// }
+
+// void pulseCounter() {
+//   pulseCount++;
+//   lastPulseTime = millis();
+// }
+
+// float getCalibrationFactor(int pump, unsigned long volume) {
+//   if (volume <= 50) return allCalibrationFactors[pump][0];
+//   if (volume <= 100) return allCalibrationFactors[pump][1];
+//   if (volume <= 150) return allCalibrationFactors[pump][2];
+//   return allCalibrationFactors[pump][3];
+// }
+
+// void runPump(int pump, unsigned long volume) {
+//   float calFactor = getCalibrationFactor(pump, volume);
+//   pulseCount = 0;
+//   dispensedVolume = 0;
+//   lastPulseTime = millis();
+
+//   digitalWrite(allPumpPins[pump], HIGH);
+//   if (allSensorPins[pump] != -1) {
+//     attachInterrupt(digitalPinToInterrupt(allSensorPins[pump]), pulseCounter, FALLING);
+//   }
+//   pumpOn = true;
+//   currentPump = pump;
+
+//   Serial.print("\xE2\x9A\x99\xEF\xB8\x8F Pump ");
+//   Serial.print(pump + 1);
+//   Serial.print(" ON - Target: ");
+//   Serial.print(volume);
+//   Serial.print(" mL | Cal: ");
+//   Serial.println(calFactor, 2);
+// }
+
+// void showCalibration(int pump) {
+//   Serial.println("\xF0\x9F\x93\x8A Current Calibration:");
+//   Serial.print("0-50mL: "); Serial.println(allCalibrationFactors[pump][0], 2);
+//   Serial.print("51-100mL: "); Serial.println(allCalibrationFactors[pump][1], 2);
+//   Serial.print("101-150mL: "); Serial.println(allCalibrationFactors[pump][2], 2);
+//   Serial.print("151-1000mL: "); Serial.println(allCalibrationFactors[pump][3], 2);
+// }
+
+// void setup() {
+//   Serial.begin(9600);
+
+//   for (int i = 0; i < 9; i++) {
+//     pinMode(allPumpPins[i], OUTPUT);
+//     digitalWrite(allPumpPins[i], LOW);
+//     if (allSensorPins[i] != -1) {
+//       pinMode(allSensorPins[i], INPUT_PULLUP);
+//     }
+//   }
+
+//   stopAllPumps();
+//   Serial.println("✅ Multi-Pump Controller Ready");
+//   Serial.println("📘 Command Format: D<id>:<vol>[:<cal>@<range>], C<id>, S");
+// }
+
+// void loop() {
+//   if (Serial.available()) {
+//     String input = Serial.readStringUntil('\n');
+//     input.trim();
+
+//     if (input.equalsIgnoreCase("S")) {
+//       stopAllPumps();
+//     }
+//     else if (input.startsWith("C")) {
+//       int pumpId = input.substring(1).toInt();
+//       if (pumpId >= 1 && pumpId <= 9 && pumpId != 8) {
+//         showCalibration(pumpId - 1);
+//       }
+//     }
+//     else if (input.startsWith("D")) {
+//       int pumpId = input.substring(1, input.indexOf(":")) .toInt();
+//       if (pumpId < 1 || pumpId > 9 || pumpId == 8) return;
+
+//       int colon1 = input.indexOf(":");
+//       int colon2 = input.indexOf(":", colon1 + 1);
+//       int atSymbol = input.indexOf("@");
+
+//       unsigned long volume = input.substring(colon1 + 1, colon2 > 0 ? colon2 : input.length()).toInt();
+//       float newCal = -1;
+//       int range = -1;
+
+//       if (colon2 > 0) {
+//         newCal = input.substring(colon2 + 1, atSymbol > 0 ? atSymbol : input.length()).toFloat();
+//         if (atSymbol > 0) {
+//           range = input.substring(atSymbol + 1).toInt();
+//         }
+//       }
+
+//       if (newCal > 0 && range >= 0 && range <= 3) {
+//         allCalibrationFactors[pumpId - 1][range] = newCal;
+//         Serial.print("🔧 Calibration updated: Pump ");
+//         Serial.print(pumpId);
+//         Serial.print(" Range ");
+//         Serial.print(range);
+//         Serial.print(" → ");
+//         Serial.println(newCal, 2);
+//       }
+
+//       targetVolume = volume;
+//       runPump(pumpId - 1, volume);
+//     }
+//   }
+
+//   if (pumpOn && currentPump != -1) {
+//     float currentVolume = pulseCount / getCalibrationFactor(currentPump, targetVolume);
+
+//     static unsigned long lastPrint = 0;
+//     if (millis() - lastPrint >= 1000) {
+//       lastPrint = millis();
+//       Serial.print("📏 Pulses: ");
+//       Serial.print(pulseCount);
+//       Serial.print(" | Flow: ");
+//       Serial.print(currentVolume - dispensedVolume, 1);
+//       Serial.print(" mL/s | Total: ");
+//       Serial.print(currentVolume, 1);
+//       Serial.print("/");
+//       Serial.print(targetVolume);
+//       Serial.println(" mL");
+//     }
+
+//     if (currentVolume >= targetVolume) {
+//       stopAllPumps();
+//       Serial.println("🌟 Target reached!");
+//     }
+//     else if (millis() - lastPulseTime > 2000) {
+//       stopAllPumps();
+//       Serial.println("⚠️ No flow detected - Pump stopped!");
+//     }
+//   }
+// }
 
 
 #include <Arduino.h>
 
 const int allPumpPins[9] = {PB9, PB8, PB7, PB6, PB5, PB4, PB3, PA15, PA12};
-const int allSensorPins[9] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, -1, PA8}; // -1 for Pump 8 (no sensor)
+const int allSensorPins[9] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, -1, PA8};
 
 float allCalibrationFactors[9][4] = {
-  {18.00, 23.00, 30.00, 50.00},  // Pump 1
-  {1.90,  1.90,  1.90,  1.90},   // Pump 2
-  {2.40,  5.20,  5.50,  5.50},   // Pump 3
-  {3.00,  8.70,  10.00, 10.00},  // Pump 4
-  {8.00,  13.00, 15.00, 15.00},  // Pump 5
-  {4.10,  4.70,  5.18,  5.56},   // Pump 6
-  {4.10,  3.12,  2.34,  1.71},   // Pump 7
-  {0,     0,     0,     0},      // Pump 8 (not included)
-  {31.30, 31.30, 29.80, 28.50}   // Pump 9
+  {18, 23, 30.00, 50.00},     // Pump 1
+  {1.9, 1.9, 1.9, 1.9},       // Pump 2
+  {2.4, 5.2, 5.5, 5.5},       // Pump 3
+  {3, 8.7, 10, 10},           // Pump 4
+  {8, 13, 15, 15},            // Pump 5
+  {4.1, 4.7, 5.18, 5.56},     // Pump 6
+  {4.1, 3.12, 2.34, 1.71},    // Pump 7
+  {0, 0, 0, 0},               // Pump 8 (time-based, calibration not used)
+  {31.30, 31.30, 29.80, 28.50} // Pump 9
 };
 
 volatile uint32_t pulseCount = 0;
@@ -390,18 +562,22 @@ unsigned long targetVolume = 0;
 unsigned long dispensedVolume = 0;
 unsigned long lastPulseTime = 0;
 bool pumpOn = false;
-int currentPump = -1;
+
+unsigned long startTime = 0;
+unsigned long targetDuration = 0; // For pump 8 only
+
+int currentPumpId = -1;
 
 void stopAllPumps() {
   for (int i = 0; i < 9; i++) {
     digitalWrite(allPumpPins[i], LOW);
   }
-  if (pumpOn && currentPump != 7) {
-    detachInterrupt(digitalPinToInterrupt(allSensorPins[currentPump]));
+  if (pumpOn && currentPumpId != 7) {
+    int sensorPin = allSensorPins[currentPumpId];
+    if (sensorPin != -1) detachInterrupt(digitalPinToInterrupt(sensorPin));
   }
   pumpOn = false;
-  currentPump = -1;
-  Serial.println("\xF0\x9F\x9B\x91 ALL PUMPS OFF");
+  Serial.println("🛑 ALL PUMPS OFF");
 }
 
 void pulseCounter() {
@@ -409,56 +585,72 @@ void pulseCounter() {
   lastPulseTime = millis();
 }
 
-float getCalibrationFactor(int pump, unsigned long volume) {
-  if (volume <= 50) return allCalibrationFactors[pump][0];
-  if (volume <= 100) return allCalibrationFactors[pump][1];
-  if (volume <= 150) return allCalibrationFactors[pump][2];
-  return allCalibrationFactors[pump][3];
+float getCalibrationFactor(int pumpId, unsigned long volume) {
+  if (volume <= 50) return allCalibrationFactors[pumpId][0];
+  if (volume <= 100) return allCalibrationFactors[pumpId][1];
+  if (volume <= 150) return allCalibrationFactors[pumpId][2];
+  return allCalibrationFactors[pumpId][3];
 }
 
-void runPump(int pump, unsigned long volume) {
-  float calFactor = getCalibrationFactor(pump, volume);
+void runPump(int pumpId, unsigned long volume) {
+  float cal = getCalibrationFactor(pumpId, volume);
   pulseCount = 0;
   dispensedVolume = 0;
   lastPulseTime = millis();
 
-  digitalWrite(allPumpPins[pump], HIGH);
-  if (allSensorPins[pump] != -1) {
-    attachInterrupt(digitalPinToInterrupt(allSensorPins[pump]), pulseCounter, FALLING);
+  digitalWrite(allPumpPins[pumpId], HIGH);
+  if (pumpId != 7) {
+    int sensorPin = allSensorPins[pumpId];
+    if (sensorPin != -1) attachInterrupt(digitalPinToInterrupt(sensorPin), pulseCounter, FALLING);
+  } else {
+    // Pump 8 time-based
+    if (volume == 50) targetDuration = 6236;
+    else if (volume == 100) targetDuration = 12208;
+    else if (volume == 150) targetDuration = 18400;
+    else {
+      Serial.println("❌ Unsupported volume for Pump 8. Use 50, 100, 150 mL");
+      return;
+    }
+    startTime = millis();
   }
-  pumpOn = true;
-  currentPump = pump;
 
-  Serial.print("\xE2\x9A\x99\xEF\xB8\x8F Pump ");
-  Serial.print(pump + 1);
-  Serial.print(" ON - Target: ");
-  Serial.print(volume);
-  Serial.print(" mL | Cal: ");
-  Serial.println(calFactor, 2);
+  pumpOn = true;
+  currentPumpId = pumpId;
+  Serial.print("⚙️ Pump "); Serial.print(pumpId + 1);
+  Serial.print(" ON - Target: "); Serial.print(volume);
+  if (pumpId != 7) {
+    Serial.print(" mL | Cal: "); Serial.println(cal, 2);
+  } else {
+    Serial.print(" mL | Duration: "); Serial.print(targetDuration / 1000.0, 3);
+    Serial.println(" seconds");
+  }
 }
 
-void showCalibration(int pump) {
-  Serial.println("\xF0\x9F\x93\x8A Current Calibration:");
-  Serial.print("0-50mL: "); Serial.println(allCalibrationFactors[pump][0], 2);
-  Serial.print("51-100mL: "); Serial.println(allCalibrationFactors[pump][1], 2);
-  Serial.print("101-150mL: "); Serial.println(allCalibrationFactors[pump][2], 2);
-  Serial.print("151-1000mL: "); Serial.println(allCalibrationFactors[pump][3], 2);
+void showCalibration(int pumpId) {
+  Serial.print("📊 Current Calibration for Pump "); Serial.println(pumpId + 1);
+  Serial.print("0-50mL: "); Serial.println(allCalibrationFactors[pumpId][0], 2);
+  Serial.print("51-100mL: "); Serial.println(allCalibrationFactors[pumpId][1], 2);
+  Serial.print("101-150mL: "); Serial.println(allCalibrationFactors[pumpId][2], 2);
+  Serial.print("151-1000mL: "); Serial.println(allCalibrationFactors[pumpId][3], 2);
 }
 
 void setup() {
   Serial.begin(9600);
-
   for (int i = 0; i < 9; i++) {
     pinMode(allPumpPins[i], OUTPUT);
     digitalWrite(allPumpPins[i], LOW);
-    if (allSensorPins[i] != -1) {
-      pinMode(allSensorPins[i], INPUT_PULLUP);
-    }
   }
-
+  for (int i = 0; i < 9; i++) {
+    if (allSensorPins[i] != -1) pinMode(allSensorPins[i], INPUT_PULLUP);
+  }
   stopAllPumps();
-  Serial.println("✅ Multi-Pump Controller Ready");
-  Serial.println("📘 Command Format: D<id>:<vol>[:<cal>@<range>], C<id>, S");
+  Serial.println("✅ All Pumps Controller Ready");
+  Serial.println("📘 Commands:");
+  Serial.println("  D<id>:<volume>         - Dispense volume (mL)");
+  Serial.println("  D<id>:<v>:<cal>@<r>    - Set calibration + dispense (e.g. D3:100:4.3@1)");
+  Serial.println("  D<id>:<r>:<cal>        - Set calibration only (e.g. D6:2:5.5)");
+  Serial.println("  C<id>                  - Show calibration for pump");
+  Serial.println("  S                      - Stop all pumps");
 }
 
 void loop() {
@@ -468,71 +660,90 @@ void loop() {
 
     if (input.equalsIgnoreCase("S")) {
       stopAllPumps();
-    }
-    else if (input.startsWith("C")) {
-      int pumpId = input.substring(1).toInt();
-      if (pumpId >= 1 && pumpId <= 9 && pumpId != 8) {
-        showCalibration(pumpId - 1);
-      }
-    }
-    else if (input.startsWith("D")) {
-      int pumpId = input.substring(1, input.indexOf(":")) .toInt();
-      if (pumpId < 1 || pumpId > 9 || pumpId == 8) return;
+    } else if (input.startsWith("S")) {
+      int pumpId = input.substring(1).toInt() - 1;
+      if (pumpId >= 0 && pumpId < 9) showCalibration(pumpId);
+    } else if (input.startsWith("D")) {
+      stopAllPumps();
 
-      int colon1 = input.indexOf(":");
-      int colon2 = input.indexOf(":", colon1 + 1);
-      int atSymbol = input.indexOf("@");
+      int dIndex = 1;
+      int colon1 = input.indexOf(':');
+      int colon2 = input.indexOf(':', colon1 + 1);
+      int atIndex = input.indexOf('@');
+
+      int pumpId = input.substring(dIndex, colon1).toInt() - 1;
+      if (pumpId < 0 || pumpId >= 9) {
+        Serial.println("❌ Invalid pump ID");
+        return;
+      }
 
       unsigned long volume = input.substring(colon1 + 1, colon2 > 0 ? colon2 : input.length()).toInt();
-      float newCal = -1;
-      int range = -1;
 
-      if (colon2 > 0) {
-        newCal = input.substring(colon2 + 1, atSymbol > 0 ? atSymbol : input.length()).toFloat();
-        if (atSymbol > 0) {
-          range = input.substring(atSymbol + 1).toInt();
+      if (colon2 > 0 && atIndex > 0) {
+        float cal = input.substring(colon2 + 1, atIndex).toFloat();
+        int range = input.substring(atIndex + 1).toInt();
+        if (range >= 0 && range < 4 && cal > 0 && pumpId != 7) {
+          allCalibrationFactors[pumpId][range] = cal;
+          Serial.print("🔧 Calibration updated: Pump "); Serial.print(pumpId + 1);
+          Serial.print(" Range "); Serial.print(range);
+          Serial.print(" → "); Serial.println(cal, 2);
+        }
+      } else if (colon2 > 0) {
+        int range = input.substring(colon1 + 1, colon2).toInt();
+        float cal = input.substring(colon2 + 1).toFloat();
+        if (range >= 0 && range < 4 && cal > 0 && pumpId != 7) {
+          allCalibrationFactors[pumpId][range] = cal;
+          Serial.print("🔧 Calibration updated: Pump "); Serial.print(pumpId + 1);
+          Serial.print(" Range "); Serial.print(range);
+          Serial.print(" → "); Serial.println(cal, 2);
+          return;
         }
       }
 
-      if (newCal > 0 && range >= 0 && range <= 3) {
-        allCalibrationFactors[pumpId - 1][range] = newCal;
-        Serial.print("🔧 Calibration updated: Pump ");
-        Serial.print(pumpId);
-        Serial.print(" Range ");
-        Serial.print(range);
-        Serial.print(" → ");
-        Serial.println(newCal, 2);
-      }
-
       targetVolume = volume;
-      runPump(pumpId - 1, volume);
+      runPump(pumpId, volume);
     }
   }
 
-  if (pumpOn && currentPump != -1) {
-    float currentVolume = pulseCount / getCalibrationFactor(currentPump, targetVolume);
-
-    static unsigned long lastPrint = 0;
-    if (millis() - lastPrint >= 1000) {
-      lastPrint = millis();
-      Serial.print("📏 Pulses: ");
-      Serial.print(pulseCount);
-      Serial.print(" | Flow: ");
-      Serial.print(currentVolume - dispensedVolume, 1);
-      Serial.print(" mL/s | Total: ");
-      Serial.print(currentVolume, 1);
-      Serial.print("/");
-      Serial.print(targetVolume);
-      Serial.println(" mL");
-    }
-
-    if (currentVolume >= targetVolume) {
-      stopAllPumps();
-      Serial.println("🌟 Target reached!");
-    }
-    else if (millis() - lastPulseTime > 2000) {
-      stopAllPumps();
-      Serial.println("⚠️ No flow detected - Pump stopped!");
+  if (pumpOn) {
+    if (currentPumpId == 7) {
+      static unsigned long lastPrint = 0;
+      if (millis() - lastPrint >= 1000) {
+        lastPrint = millis();
+        float elapsed = (millis() - startTime) / 1000.0;
+        Serial.print("📏 Time-Based | Elapsed: ");
+        Serial.print(elapsed, 2);
+        Serial.print("s / ");
+        Serial.print(targetDuration / 1000.0, 2);
+        Serial.println("s");
+      }
+      if (millis() - startTime >= targetDuration) {
+        digitalWrite(allPumpPins[currentPumpId], LOW);
+        pumpOn = false;
+        Serial.println("🌟 Target time reached!");
+      }
+    } else {
+      float currentVol = pulseCount / getCalibrationFactor(currentPumpId, targetVolume);
+      static unsigned long lastPrint = 0;
+      if (millis() - lastPrint >= 1000) {
+        lastPrint = millis();
+        Serial.print("📏 Pulses: "); Serial.print(pulseCount);
+        Serial.print(" | Flow: "); Serial.print(currentVol - dispensedVolume, 1);
+        Serial.print(" mL/s | Total: "); Serial.print(currentVol, 1);
+        Serial.print("/"); Serial.print(targetVolume); Serial.println(" mL");
+        dispensedVolume = currentVol;
+      }
+      if (currentVol >= targetVolume) {
+        digitalWrite(allPumpPins[currentPumpId], LOW);
+        detachInterrupt(digitalPinToInterrupt(allSensorPins[currentPumpId]));
+        pumpOn = false;
+        Serial.println("🌟 Target reached!");
+      } else if (millis() - lastPulseTime > 2000) {
+        digitalWrite(allPumpPins[currentPumpId], LOW);
+        detachInterrupt(digitalPinToInterrupt(allSensorPins[currentPumpId]));
+        pumpOn = false;
+        Serial.println("⚠️ No flow detected - Pump stopped!");
+      }
     }
   }
 }
