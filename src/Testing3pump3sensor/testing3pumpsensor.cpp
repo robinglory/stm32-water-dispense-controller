@@ -2,8 +2,8 @@
 
 // // Hardware Pins for all pumps (even though we're only using Pump 2)
 // const int allPumpPins[9] = {PB9, PB8, PB7, PB6, PB5, PB4, PB3, PA15, PA12};
-// const int pumpPin = PB7;  // Pump 2
-// const int sensorPin = PA2; // Sensor for Pump 2
+// const int pumpPin = PB7;  // Pump 3
+// const int sensorPin = PA2; // Sensor for Pump 3
 
 // // Calibration factors [0-50mL, 51-100mL, 101-150mL, 151-1000mL]
 // float calibrationFactors[4] = {2.4, 5.2, 5.5, 5.5}; // Initial values
