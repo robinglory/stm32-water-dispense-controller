@@ -371,11 +371,11 @@
 
 // Hardware Pins for all pumps (even though we're only using Pump 2)
 const int allPumpPins[9] = {PB9, PB8, PB7, PB6, PB5, PB4, PB3, PA15, PA12};
-const int pumpPin = PB4;  // Pump 6
-const int sensorPin = PA5; // Sensor for Pump 4
+const int pumpPin = PB3;  // Pump 7
+const int sensorPin = PA6; // Sensor for Pump 7
 
 // Calibration factors [0-50mL, 51-100mL, 101-150mL, 151-1000mL]
-float calibrationFactors[4] = {4.1, 4.7, 5.18, 5.56}; // Initial values
+float calibrationFactors[4] = {4.1, 3.12, 2.34, 1.71}; // Initial values
 
 // Dispensing control
 volatile uint32_t pulseCount = 0;
@@ -406,7 +406,7 @@ void stopPump() {
     detachInterrupt(digitalPinToInterrupt(sensorPin));
     pumpOn = false;
   }
-  Serial.println("🚑 Pump 6 OFF");
+  Serial.println("🚑 Pump 7 OFF");
 }
 
 float getCalibrationFactor(unsigned long volume) {
@@ -426,7 +426,7 @@ void runPump(unsigned long volume) {
   attachInterrupt(digitalPinToInterrupt(sensorPin), pulseCounter, FALLING);
   pumpOn = true;
 
-  Serial.print("⚙️ Pump 6 ON - Target: ");
+  Serial.print("⚙️ Pump 7 ON - Target: ");
   Serial.print(volume);
   Serial.print(" mL | Cal: ");
   Serial.println(calFactor, 2);
@@ -452,11 +452,11 @@ void setup() {
   pinMode(sensorPin, INPUT_PULLUP);
   stopAllPumps(); // Ensure all pumps are off at startup
 
-  Serial.println("✅ Pump 6 Test System Ready");
+  Serial.println("✅ Pump 7 Test System Ready");
   Serial.println("📘 Commands:");
-  Serial.println("  D6:<volume>       - Dispense volume (mL)");
-  Serial.println("  D6:<v>:<cal>@<r> - Set cal & dispense (e.g. D4:100:11.5@1)");
-  Serial.println("  D6:<r>:<cal>      - Set calibration only (e.g. D4:2:30)");
+  Serial.println("  D7:<volume>       - Dispense volume (mL)");
+  Serial.println("  D7:<v>:<cal>@<r> - Set cal & dispense (e.g. D4:100:11.5@1)");
+  Serial.println("  D7:<r>:<cal>      - Set calibration only (e.g. D4:2:30)");
   Serial.println("  C                - Show calibration");
   Serial.println("  S                - Stop all pumps");
 }
@@ -472,7 +472,7 @@ void loop() {
     else if (input.equalsIgnoreCase("C")) {
       showCalibration();
     }
-    else if (input.startsWith("D6:")) {
+    else if (input.startsWith("D7:")) {
       stopAllPumps(); // Stop all pumps before starting a new operation
       
       int colon1 = input.indexOf(':');
