@@ -1,4 +1,7 @@
 # STM32 Multi-Pump Water Dispensing System 🚰
+[![PlatformIO](https://img.shields.io/badge/platformio-stm32-blue)](https://platformio.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![YouTube Demo](https://img.shields.io/badge/demo-youtube-red)](https://youtu.be/rZtVd0Mnc2o)
 
 This project controls up to 9 water pumps with independent flow sensors using an STM32 microcontroller. Each pump dispenses a user-defined volume of water in milliliters (mL), and the system adjusts output using calibration factors or time-based estimates.
 
