@@ -230,10 +230,3 @@ S              // Stop all pumps
 Robin Glory
 Mechatronics & Computer Science Student
 GitHub: [robinglory](https://github.com/robinglory)
-
----
-
-```
-
-Let me know if you want me to [add it directly into your repo](f) or format it into a downloadable file.
-```
